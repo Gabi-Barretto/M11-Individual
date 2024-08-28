@@ -1,0 +1,5 @@
+train: C:/Users/gabig/OneDrive/Área de Trabalho/Trees/Images/Trees - 5/train/images
+val: C:/Users/gabig/OneDrive/Área de Trabalho/Trees/Images/Trees - 5/valid/images
+
+nc: 1  # Número de classes (1 se for apenas 'árvore')
+names: ['tree']
