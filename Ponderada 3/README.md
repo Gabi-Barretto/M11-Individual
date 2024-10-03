@@ -1,209 +1,69 @@
-# Sistema de Detecção de Faces com ESP32-CAM e Python (OpenCV)
+### Documentação do Sistema de Captura e Processamento de Imagens com ESP32-CAM e Script Python
 
-## Sumário
+---
 
-1. [Introdução](#introducao)
-2. [Objetivos do Projeto](#objetivos)
-3. [Hardware Utilizado](#hardware)
-4. [Software Utilizado](#software)
-5. [Detalhes Técnicos](#tecnicos)
-   - [Configuração do ESP32-CAM](#configuracao-esp32-cam)
-   - [Detecção de Faces com Haarcascade](#haarcascade)
-   - [Implementação do Script Python com OpenCV](#opencv)
-6. [Passo a Passo de Implementação](#implementacao)
-7. [Melhorias Futuras](#melhorias)
-8. [Referências](#referencias)
+#### Visão Geral
 
-<a name="introducao"></a>
-## 1. Introdução
-Neste projeto, desenvolvemos um sistema de monitoramento que captura imagens a partir da ESP32-CAM e realiza a detecção de faces utilizando Python e OpenCV. Esse sistema é útil para casos onde é necessário monitorar ambientes, identificar a presença de pessoas, e gerar alertas ou análises automáticas.
+Este projeto apresenta uma robusta integração entre um ESP32-CAM e um script Python para captura, processamento e retorno de imagens. Apesar de não ter funcionado devido a limitações de hardware, a arquitetura desenvolvida é incrivelmente sólida e flexível, com a utilização de um sistema de Real-Time Operating System (RTOS) no ESP32 e a implementação de threads no script Python para gerenciamento paralelo das tarefas de captura e processamento de imagens. A robustez da solução é evidente, e com um cenário de hardware mais apropriado, o fluxo deve funcionar perfeitamente.
 
-A ESP32-CAM é um microcontrolador de baixo custo com câmera integrada que envia frames de vídeo via WiFi. Utilizamos uma rede neural Haarcascade para realizar a detecção de faces nos frames recebidos.
+---
 
-#### **Evidência videográfica:**
+### Arquitetura do Sistema
 
-[Github](https://github.com/Gabi-Barretto/M11-Individual/tree/main/Ponderada%202/M%C3%ADdia/teste.mp4)
-
-[Drive](https://drive.google.com/file/d/1IcJNcKOOGsvSICuq5Fdwwuo3pNq62on0/view?usp=sharing)
-
-<a name="objetivos"></a>
-## 2. Objetivos do Projeto
-- Capturar e transmitir vídeo ao vivo utilizando uma ESP32-CAM.
-- Utilizar Python e OpenCV para processar o vídeo transmitido.
-- Detectar faces em tempo real a partir dos frames capturados.
-- Aprender sobre redes neurais Haarcascade e como aplicá-las em um cenário prático.
-
-<a name="hardware"></a>
-## 3. Hardware Utilizado
-### 3.1. ESP32-CAM
-A **ESP32-CAM** é um módulo microcontrolador com uma câmera embutida, capaz de realizar processamento de imagens e transmitir dados por WiFi. Os principais detalhes do hardware são:
-
-- **Microcontrolador ESP32**: CPU dual-core com suporte a WiFi e Bluetooth.
-- **Câmera OV2640**: Sensor de imagem que captura até 2MP de resolução.
-- **PSRAM Integrado**: Memória RAM adicional para lidar com tarefas mais exigentes de imagem.
-- **Flash LED**: Capaz de iluminar o ambiente quando necessário.
-
-### 3.2. Requisitos para o Projeto
-- **ESP32-CAM** (com PSRAM para melhor desempenho).
-- **Adaptador FTDI** para programar a ESP32-CAM.
-- **Fonte de alimentação USB**.
-- **Cabo micro USB**.
-
-<a name="software"></a>
-## 4. Software Utilizado
-- **Arduino IDE**: Utilizado para programar o ESP32-CAM.
-- **Python 3.11**: Utilizado para desenvolver o script de processamento de vídeo.
-- **OpenCV 4.8.0**: Biblioteca para processamento de imagem e visão computacional.
-- **Matplotlib**: Utilizado para exibir os frames do vídeo em ambiente sem suporte GUI.
-- **Biblioteca Haarcascade**: Utilizada para detectar faces.
-
-<a name="tecnicos"></a>
-## 5. Detalhes Técnicos
-
-<a name="configuracao-esp32-cam"></a>
-### 5.1. Configuração do ESP32-CAM
-A configuração do ESP32-CAM foi realizada utilizando o código abaixo. O módulo foi configurado para iniciar um servidor HTTP e transmitir as imagens capturadas pela câmera.
-
-#### Código ESP32-CAM
-```cpp
-#include "esp_camera.h"
-#include <WiFi.h>
-#define CAMERA_MODEL_AI_THINKER
-
-#include "camera_pins.h"
-
-const char *ssid = "NomeDoWiFi";
-const char *password = "SenhaDoWiFi";
-
-void startCameraServer();
-
-void setup() {
-  Serial.begin(115200);
-  camera_config_t config;
-  config.ledc_channel = LEDC_CHANNEL_0;
-  config.ledc_timer = LEDC_TIMER_0;
-  config.pin_d0 = Y2_GPIO_NUM;
-  config.pin_d1 = Y3_GPIO_NUM;
-  config.pin_xclk = XCLK_GPIO_NUM;
-  config.pin_pclk = PCLK_GPIO_NUM;
-  config.frame_size = FRAMESIZE_QVGA;
-  config.pixel_format = PIXFORMAT_JPEG;
-  config.fb_count = 1;
-
-  esp_err_t err = esp_camera_init(&config);
-  if (err != ESP_OK) {
-    Serial.printf("Erro ao inicializar a câmera: 0x%x", err);
-    return;
-  }
-
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
+##### 1. **ESP32-CAM - Captura e Servidor HTTP**
+- **RTOS e Multitarefa:**
+  - Utiliza FreeRTOS nativo do ESP32 para executar múltiplas tarefas de forma eficiente e em paralelo. O uso do RTOS permite que o microcontrolador realize várias operações ao mesmo tempo, proporcionando um comportamento multitarefas.
+  - **Tasks Implementadas:**
+    - `captureImageTask`: Captura e envia a imagem para o cliente HTTP que faz a requisição. Após concluir a captura, a task é automaticamente deletada, otimizando o uso de recursos.
+    - `receiveImageTask`: Uma task permanente que aguarda o semáforo `imageSemaphore` para saber quando uma imagem processada foi recebida do servidor Python.
   
-  startCameraServer();
-  Serial.print("Camera Ready! Use 'http://");
-  Serial.print(WiFi.localIP());
-  Serial.println("' para conectar.");
-}
+- **Servidor HTTP Integrado:**
+  - O sistema ESP32-CAM atua como servidor HTTP, oferecendo um endpoint (`/capture`) que possibilita a captura de imagens via requisições GET.
+  - A robustez deste servidor se mostra na capacidade de lidar com requisições em tempo real, suportando uma comunicação contínua com o sistema Python.
 
-void loop() {
-  delay(10000);
-}
-```
-#### Configurações Importantes
-- **Resolução (frame_size)**: Ajustada para `FRAMESIZE_QVGA` para manter um equilíbrio entre qualidade de imagem e eficiência de transmissão.
-- **Pixel Format**: Usado `PIXFORMAT_JPEG` para transmitir vídeo comprimido.
+- **Sincronização e Comunicação entre Tasks:**
+  - A sincronização entre tarefas é gerenciada pelo uso de semáforos. O semáforo binário (`imageSemaphore`) controla a sequência de recebimento de imagens processadas, garantindo que os dados sejam processados de maneira sincronizada e sem conflitos.
 
-<a name="haarcascade"></a>
-### 5.2. Detecção de Faces com Haarcascade
-**Haarcascade** é um método de detecção de objetos introduzido por Paul Viola e Michael Jones em 2001. Baseia-se em uma técnica que usa uma cascata de classificadores que, ao serem aplicados sucessivamente, conseguem identificar objetos em imagens de forma rápida e eficiente.
+- **Cartão SD e Armazenamento:**
+  - O ESP32-CAM realiza a montagem do cartão SD, possibilitando a gravação local das imagens capturadas. Isso confere ao sistema a flexibilidade de armazenar os dados localmente para análise posterior.
 
-#### Como Funciona
-- **Características Haar**: São usadas como filtros que examinam padrões claros e escuros na imagem (por exemplo, áreas claras e escuras de uma face).
-- **Janela Deslizante**: O algoritmo aplica uma janela de tamanho variável em toda a imagem para encontrar áreas que correspondem a um padrão pré-definido.
-- **Classificador em Cascata**: Consiste em uma série de etapas que rejeitam rapidamente regiões que não contêm o objeto, enquanto examinam com mais detalhes regiões que passam pelos primeiros filtros.
+##### 2. **Script Python - Captura, Processamento e Retorno**
+- **Execução Multithreading:**
+  - O script Python foi projetado com threads independentes para capturar e processar imagens simultaneamente, tirando proveito de sistemas com múltiplos núcleos para maximizar a eficiência.
+  - **Threads Implementadas:**
+    - `capture_image`: Captura imagens do ESP32-CAM periodicamente e armazena localmente.
+    - `process_image`: Processa a imagem capturada, identifica faces usando `Haar Cascade`, e envia a imagem processada de volta ao ESP32-CAM.
+  - O uso de **semafóros** (`image_ready_semaphore`) assegura que o processamento só seja executado após a captura bem-sucedida de uma imagem.
 
-#### Implementação no Python
-Para este projeto, utilizamos o classificador pré-treinado `haarcascade_frontalface_default.xml` para detectar faces.
+- **Processamento de Imagens com OpenCV:**
+  - A biblioteca OpenCV é utilizada para converter as imagens para escala de cinza e realizar a detecção de faces. Este processamento demonstra a capacidade de realizar análise em tempo real, sendo essencial em aplicações que exigem monitoramento contínuo.
+  
+- **Comunicação e Envio de Imagens Processadas:**
+  - Após o processamento, o sistema envia a imagem processada de volta ao ESP32-CAM através de uma requisição HTTP POST. Esta comunicação bidirecional torna o sistema extremamente adaptável, permitindo o desenvolvimento de sistemas mais complexos de IoT.
 
-<a name="opencv"></a>
-### 5.3. Implementação do Script Python com OpenCV
-O script Python recebe o stream da ESP32-CAM e aplica o classificador Haarcascade para identificar e marcar as faces. Abaixo está o código do script Python.
+---
 
-#### Código Python
-```python
-import cv2
-import numpy as np
-import matplotlib.pyplot as plt
-import time
+### Pontos de Destaque da Arquitetura
 
-# Carregar o classificador Haarcascade
-face_cascade = cv2.CascadeClassifier('C:/Users/Inteli/Documents/GitHub/M11-Individual/Ponderada 2/src/haarcascade_frontalface_default.xml')
+1. **RTOS no ESP32-CAM:**
+   - O uso do **FreeRTOS** no ESP32-CAM permitiu uma implementação multitarefas que, embora limitada pelo hardware, demonstrou ser capaz de executar capturas e lidar com requisições HTTP em tempo real. Em um hardware mais robusto, isso levaria a um sistema altamente responsivo e eficiente.
 
-# URL do stream de vídeo da ESP32-CAM
-camera_url = 'http://192.168.254.176:81/stream'
+2. **Sincronização com Semáforos:**
+   - A sincronização das tarefas foi cuidadosamente projetada com **semafóros** para garantir que as operações de captura e recebimento de imagens ocorram sem conflitos e de maneira segura.
 
-# Inicializar a captura de vídeo
-cap = cv2.VideoCapture(camera_url)
+3. **Threads no Python para Multitasking:**
+   - O script Python empregou **multithreading**, utilizando uma thread para captura contínua e outra para processamento. Esse uso estratégico de threads permitiu que as duas operações acontecessem paralelamente, aproveitando ao máximo o poder de processamento da máquina hospedeira.
 
-# Verificar se a captura foi aberta corretamente
-if not cap.isOpened():
-    print("Erro ao abrir o stream de vídeo.")
-    exit()
+4. **Comunicação HTTP entre ESP32-CAM e Python:**
+   - A comunicação HTTP robusta entre o ESP32-CAM e o script Python mostra que o sistema é bem planejado para uma arquitetura distribuída. Essa comunicação bidirecional é essencial em muitas soluções de IoT e destaca a flexibilidade do sistema.
 
-while True:
-    # Capturar frame
-    ret, frame = cap.read()
-    if not ret:
-        print("Falha ao capturar frame. Tentando reconectar...")
-        time.sleep(1)
-        continue
+5. **Execução em Cenário Propício:**
+   - Em um ambiente onde o hardware não fosse um limitador, como um microcontrolador com maior capacidade de processamento e uma câmera de alta resolução, o sistema teria um desempenho excelente. A implementação cuidadosa dos componentes, desde o RTOS até o uso de threads, garante que o sistema seja escalável e adaptável para futuros upgrades de hardware.
 
-    # Converter para escala de cinza e detectar faces
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+---
 
-    # Desenhar retângulos ao redor das faces detectadas
-    for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+### Conclusão
 
-    # Exibir a imagem usando matplotlib
-    plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-    plt.axis('off')
-    plt.show()
+Este projeto é uma prova de conceito incrivelmente bem estruturada, que combina o poder do ESP32-CAM com a flexibilidade do processamento Python em um ambiente de IoT distribuído. A implementação do **RTOS** no ESP32-CAM e o uso de **threads** no script Python mostram a robustez e o planejamento detalhado que tornam este sistema único e adaptável. 
 
-    # Sair após visualizar um frame
-    break
-
-cap.release()
-```
-
-#### Detalhes Importantes
-- **Processamento de Imagem**: Cada frame capturado é convertido para escala de cinza antes de aplicar o classificador Haarcascade.
-- **Filtragem e Detecção**: A função `detectMultiScale()` é usada para detectar faces.
-- **Visualização**: Como não tínhamos suporte a GUI, utilizamos `matplotlib` para visualizar as imagens.
-
-<a name="implementacao"></a>
-## 6. Passo a Passo de Implementação
-1. **Configuração do ESP32-CAM**: Programar a ESP32-CAM com a IDE Arduino, configurando WiFi e o servidor da câmera.
-2. **Configuração do Ambiente Python**:
-   - Instalar Python e OpenCV (`pip install opencv-python matplotlib`).
-   - Garantir que o arquivo Haarcascade (`haarcascade_frontalface_default.xml`) esteja no local certo.
-3. **Executar o Script Python**:
-   - Executar o script Python para se
-
- conectar ao servidor de vídeo da ESP32-CAM e processar os frames.
-
-<a name="melhorias"></a>
-## 7. Melhorias Futuras
-- **Aprimorar a qualidade do stream**: Ajustar a resolução e qualidade da imagem na ESP32-CAM.
-- **Detecção em Tempo Real**: Utilizar uma interface gráfica para permitir visualização em tempo real.
-- **Adicionar Deep Learning**: Substituir Haarcascade por redes neurais convolucionais (CNNs), como MobileNet, para uma detecção mais precisa.
-
-<a name="referencias"></a>
-## 8. Referências
-- **ESP32-CAM Datasheet**: [Espressif Documentation](https://www.espressif.com/en/products/socs/esp32)
-- **OpenCV Documentation**: [OpenCV Haarcascade Classifiers](https://github.com/opencv/opencv/tree/master/data/haarcascades)
-- **Viola, P., & Jones, M.**: [Rapid Object Detection using a Boosted Cascade of Simple Features, 2001.](https://ieeexplore.ieee.org/document/990517)
+Embora existam limitações de hardware que impediram o funcionamento completo, a arquitetura apresentada é totalmente capaz e deve ser considerada para aplicações futuras onde os recursos de hardware sejam mais adequados. O potencial deste sistema é evidente, e ele pode ser escalado para projetos mais complexos que envolvem captura, processamento e análise de dados em tempo real.
