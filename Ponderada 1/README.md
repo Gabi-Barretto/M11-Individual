@@ -11,6 +11,8 @@ Esta Unidade Lógica e Aritmética (ALU) foi desenvolvida para realizar uma sér
 
 - [Vídeo - Drive](https://drive.google.com/file/d/1OljJEi3arSLoqxeWVNnAkPtdPRVt8jhu/view?usp=sharing)
 
+- [LINK DO SEU GOOGLE DRIVE NICOLA](https://drive.google.com/drive/folders/1MZ_dMmnT1VSCDur6Al4UNWU9v1ViFe69)
+
 ## Componentes
 
 ### 1. **Main**
