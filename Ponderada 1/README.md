@@ -3,9 +3,10 @@
 ## Introdução
 Esta Unidade Lógica e Aritmética (ALU) foi desenvolvida para realizar uma série de operações lógicas e aritméticas em operandos de 8 bits. A ALU é composta de diversos componentes que trabalham em conjunto para fornecer a funcionalidade completa de um processador aritmético. A seguir, apresentaremos uma visão geral de cada um dos componentes utilizados neste projeto.
 
-![Imagem](Mídia\ALU.png)
+![Imagem](https://github.com/Gabi-Barretto/M11-Individual/blob/main/Ponderada%201/M%C3%ADdia/ALU.png)
 
-[Vídeo - Github]()
+
+[Vídeo - Github](https://github.com/Gabi-Barretto/M11-Individual/blob/main/Ponderada%201/M%C3%ADdia/Teste%20-%20ALU%20e%20Circuitos.mp4)
 [Vídeo - Drive](https://drive.google.com/file/d/1OljJEi3arSLoqxeWVNnAkPtdPRVt8jhu/view?usp=sharing)
 
 ## Componentes
