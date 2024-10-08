@@ -1,4 +1,4 @@
-### Documentação Atualizada: Utilizando Modelos de Linguagem Grande (LLM) no Raspberry Pi 5 com DistilGPT-2
+### Utilizando Modelos de Linguagem Grande (LLM) no Raspberry Pi 5 com DistilGPT-2
 
 #### 1. **Introdução**
 
@@ -138,4 +138,4 @@ Ao rodar o código, você pode encontrar algumas advertências:
 - **TensorFlow Lite**: Considerar a conversão do modelo para **TensorFlow Lite** para melhorar a performance em dispositivos embarcados como o Raspberry Pi.
 
 #### 9. **Conclusão**
-Agora, com este guia atualizado, você tem um gerador de textos dinâmico rodando no seu Raspberry Pi 5, que permite inserir novos prompts e ajustar o comprimento dos textos de forma interativa. Com as correções e melhorias feitas, o processo está mais robusto e eficiente para seu uso.
+Agora, com este guia, você tem um gerador de textos dinâmico rodando no seu Raspberry Pi 5, que permite inserir novos prompts e ajustar o comprimento dos textos de forma interativa. Com as correções e melhorias feitas, o processo está mais robusto e eficiente para seu uso.
