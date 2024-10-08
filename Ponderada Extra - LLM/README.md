@@ -4,6 +4,8 @@
 
 Este guia atualizado mostra como rodar o modelo **DistilGPT-2** no **Raspberry Pi 5** para gerar textos dinamicamente. O modelo é uma versão compacta do GPT-2, ajustada para rodar em dispositivos com recursos limitados, como o Raspberry Pi. Agora, além de rodar o modelo com sucesso, o código permite interatividade via terminal, corrigiu o problema de truncamento e oferece a opção de ajustar o comprimento do texto gerado a cada interação.
 
+**Importante:** O DistilGPT-2 foi treinado para trabalhar com textos em **inglês**, portanto, os prompts fornecidos pelo usuário devem estar nesse idioma para gerar textos corretamente.
+
 [Vídeo Demonstrativo](https://drive.google.com/file/d/1IxEfgYz4nK3jJHoNU66NPCAIg5XyA4d2/view?usp=sharing)
 
 #### 2. **Pré-requisitos**
@@ -43,31 +45,31 @@ def gerar_texto(prompt, max_length=50):
     return result[0]['generated_text']
 
 def main():
-    print("Bem-vindo ao gerador de texto com DistilGPT-2!")
+    print("Welcome to the DistilGPT-2 text generator!")
     
     # Loop para continuar solicitando prompts até o usuário desejar parar
     while True:
         # Solicita o prompt inicial do usuário
-        prompt = input("Digite o texto inicial (ou 'sair' para encerrar): ")
+        prompt = input("Enter your initial text in English (or 'exit' to stop): ")
 
         # Verifica se o usuário deseja encerrar
-        if prompt.lower() == 'sair':
-            print("Encerrando o gerador de texto.")
+        if prompt.lower() == 'exit':
+            print("Shutting down the text generator.")
             break
 
         # Define o comprimento máximo do texto gerado
         try:
-            max_length = int(input("Digite o comprimento máximo do texto gerado (número inteiro): "))
+            max_length = int(input("Enter the maximum text length (integer value): "))
         except ValueError:
-            print("Valor inválido. Usando o comprimento padrão de 50.")
+            print("Invalid value. Using default length of 50.")
             max_length = 50
 
         # Gera o texto com base no prompt e no comprimento especificado
-        texto_gerado = gerar_texto(prompt, max_length=max_length)
+        generated_text = gerar_texto(prompt, max_length=max_length)
         
         # Exibe o texto gerado
-        print("\nTexto gerado:\n")
-        print(texto_gerado)
+        print("\nGenerated text:\n")
+        print(generated_text)
         print("\n" + "="*50 + "\n")
 
 if __name__ == "__main__":
@@ -75,40 +77,39 @@ if __name__ == "__main__":
 ```
 
 #### 5. **Rodando o Script**
-1. Salve o código como, por exemplo, `gerador_dinamico.py`.
+1. Salve o código como, por exemplo, `dynamic_text_generator.py`.
 2. Execute o script no terminal:
 
    ```bash
-   python3 gerador_dinamico.py
+   python3 dynamic_text_generator.py
    ```
 
-3. Insira um prompt quando solicitado e ajuste o comprimento máximo de texto para cada geração. O programa continuará a solicitar novos prompts até que você digite `"sair"`.
+3. Insira um prompt em **inglês** quando solicitado e ajuste o comprimento máximo de texto para cada geração. O programa continuará a solicitar novos prompts até que você digite `"exit"`.
 
 ### Exemplo de Execução
 
 ```bash
-Bem-vindo ao gerador de texto com DistilGPT-2!
-Digite o texto inicial (ou 'sair' para encerrar): Era uma vez
-Digite o comprimento máximo do texto gerado (número inteiro): 60
+Welcome to the DistilGPT-2 text generator!
+Enter your initial text in English (or 'exit' to stop): Once upon a time
+Enter the maximum text length (integer value): 60
 
-Texto gerado:
+Generated text:
 
-Era uma vez uma floresta sombria, onde as criaturas da noite se escondiam nas sombras. Uma coruja
-observava calmamente enquanto os ventos sopravam.
-
-==================================================
-
-Digite o texto inicial (ou 'sair' para encerrar): Um robô estava no
-Digite o comprimento máximo do texto gerado (número inteiro): 40
-
-Texto gerado:
-
-Um robô estava no comando da missão, mas algo deu errado. O sistema travou.
+Once upon a time in a forest, there was a mysterious creature hiding in the shadows. The wind howled through the trees as it...
 
 ==================================================
 
-Digite o texto inicial (ou 'sair' para encerrar): sair
-Encerrando o gerador de texto.
+Enter your initial text in English (or 'exit' to stop): A robot was standing
+Enter the maximum text length (integer value): 40
+
+Generated text:
+
+A robot was standing in the middle of the room, waiting for the command. Suddenly, it began to move.
+
+==================================================
+
+Enter your initial text in English (or 'exit' to stop): exit
+Shutting down the text generator.
 ```
 
 #### 6. **Advertências e Soluções**
@@ -138,4 +139,4 @@ Ao rodar o código, você pode encontrar algumas advertências:
 - **TensorFlow Lite**: Considerar a conversão do modelo para **TensorFlow Lite** para melhorar a performance em dispositivos embarcados como o Raspberry Pi.
 
 #### 9. **Conclusão**
-Agora, com este guia, você tem um gerador de textos dinâmico rodando no seu Raspberry Pi 5, que permite inserir novos prompts e ajustar o comprimento dos textos de forma interativa. Com as correções e melhorias feitas, o processo está mais robusto e eficiente para seu uso.
+Agora, com este guia, você tem um gerador de textos dinâmico rodando no seu Raspberry Pi 5, que permite inserir novos prompts em **inglês** e ajustar o comprimento dos textos de forma interativa. Com as correções e melhorias feitas, o processo está mais robusto e eficiente para seu uso.

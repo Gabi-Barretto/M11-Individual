@@ -14,31 +14,31 @@ def gerar_texto(prompt, max_length=50):
     return result[0]['generated_text']
 
 def main():
-    print("Bem-vindo ao gerador de texto com DistilGPT-2!")
+    print("Welcome to the DistilGPT-2 text generator!")
     
     # Loop para continuar solicitando prompts até o usuário desejar parar
     while True:
         # Solicita o prompt inicial do usuário
-        prompt = input("Digite o texto inicial (ou 'sair' para encerrar): ")
+        prompt = input("Enter your initial text in English (or 'exit' to stop): ")
 
         # Verifica se o usuário deseja encerrar
-        if prompt.lower() == 'sair':
-            print("Encerrando o gerador de texto.")
+        if prompt.lower() == 'exit':
+            print("Shutting down the text generator.")
             break
 
         # Define o comprimento máximo do texto gerado
         try:
-            max_length = int(input("Digite o comprimento máximo do texto gerado (número inteiro): "))
+            max_length = int(input("Enter the maximum text length (integer value): "))
         except ValueError:
-            print("Valor inválido. Usando o comprimento padrão de 50.")
+            print("Invalid value. Using default length of 50.")
             max_length = 50
 
         # Gera o texto com base no prompt e no comprimento especificado
-        texto_gerado = gerar_texto(prompt, max_length=max_length)
+        generated_text = gerar_texto(prompt, max_length=max_length)
         
         # Exibe o texto gerado
-        print("\nTexto gerado:\n")
-        print(texto_gerado)
+        print("\nGenerated text:\n")
+        print(generated_text)
         print("\n" + "="*50 + "\n")
 
 if __name__ == "__main__":
